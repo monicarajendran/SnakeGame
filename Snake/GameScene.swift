@@ -21,20 +21,24 @@ class GameScene: SKScene {
     var gameManager: GameManager!
     var gameArray: [(node: SKShapeNode, x: Int, y: Int)] = []
     
+    typealias Position = (Int, Int)
+    var playerPositions: [Position] = []
+    
     private func initialize() {
         initLogo()
         initBestScore()
         initPlayButton()
-        gameManager = GameManager()
     }
     
     override func didMove(to view: SKView) {
         initialize()
         initGameView()
+        gameManager = GameManager(scene: self)
     }
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        gameManager.update(time: currentTime)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -110,14 +114,14 @@ class GameScene: SKScene {
         //Best score
         let bottomCorner = CGPoint(x: frame.size.width / 2, y: -600)
         bestScore.run(SKAction.move(to: bottomCorner, duration: 0.5)) {
-        self.gameBG.setScale(0)
-        self.currentScore.setScale(0)
-        self.gameBG.isHidden = false
-        self.currentScore.isHidden = false
-        self.gameBG.run(SKAction.scale(to: 1, duration: 0.4))
-        self.currentScore.run(SKAction.scale(to: 1, duration: 0.4))
+            self.gameBG.setScale(0)
+            self.currentScore.setScale(0)
+            self.gameBG.isHidden = false
+            self.currentScore.isHidden = false
+            self.gameBG.run(SKAction.scale(to: 1, duration: 0.4))
+            self.currentScore.run(SKAction.scale(to: 1, duration: 0.4))
+            self.gameManager.initGame()
         }
-        
     }
     
     func initGameView() {
@@ -148,7 +152,7 @@ class GameScene: SKScene {
                 cellNode.zPosition = 2
                 cellNode.position = CGPoint(x: x, y: y)
                 //add to array of cells -- then add to game board
-                gameArray.append((node: cellNode,x: j, y: i))
+                gameArray.append((node: cellNode, x: j, y: i))
                 gameBG.addChild(cellNode)
                 //iterate x
                 x += cellSize
@@ -160,11 +164,7 @@ class GameScene: SKScene {
     }
     
     func startGame() {
-        print("Start Game Pressed")
         initCurrentScore()
         prepareForGame()
-        initGameView()
-        
-        
     }
 }
